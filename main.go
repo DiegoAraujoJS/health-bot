@@ -1,69 +1,21 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"os"
-	"time"
 
-	"github.com/joho/godotenv"
+	"github.com/DiegoAraujoJS/health-bot/environment"
+	"github.com/DiegoAraujoJS/health-bot/health"
+	"github.com/DiegoAraujoJS/health-bot/messages"
 )
 
 func main() {
-    err := godotenv.Load()
+    env := environment.GetSafeEnvVariables()
 
-    if err != nil {
-        fmt.Println(err.Error())
-        return
-    }
-
-    ticker := time.NewTicker(60 * time.Second)
-
-    var isInErrorState = false
-
-    go func() {
-        for t := range ticker.C {
-
-            if isInErrorState {
-                pingResult := GetGitDeployHealth()
-                if pingResult {
-                    isInErrorState = false
-                }
-                continue
-            }
-
-            pingResult := GetGitDeployHealth()
-            if !pingResult {
-                isInErrorState = true
-                sendMessage(fmt.Sprintf("Request to %v failed! at %v", os.Getenv("PING_URL"), t.String()), os.Getenv("PHONE_ID"))
-            }
-
-        }
-    }()
+    health.TickHealthChecker([]func(message *messages.AlarmMessage){
+        messages.SendTelegramMessageToPhoneId(env.PhoneId),
+        messages.SendDiscordMessage(env.DiscordBotToken, env.DiscordChannelIds),
+    })
+    fmt.Println("Started to tick health checker")
 
     <- make(chan bool)
-}
-
-func sendMessage(message string, to string) {
-    botToken := os.Getenv("BOT_TOKEN")
-    body, _ := json.Marshal(map[string]string {
-        "chat_id": to,
-        "text": message,
-    })
-    fmt.Println(string(body))
-    _, err := http.Post(fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken), "application/json", bytes.NewBuffer(body))
-    if err != nil {
-        return
-    }
-}
-
-func GetGitDeployHealth() bool {
-    pingUrl := os.Getenv("PING_URL")
-    resp, err := http.Get(pingUrl)
-    if err != nil {
-        return false
-    }
-    return resp.StatusCode == 200
 }
