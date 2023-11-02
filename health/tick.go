@@ -27,14 +27,14 @@ func TickHealthChecker(onUnhealthyResponse []func (message *messages.AlarmMessag
         for t := range ticker.C {
 
             if isInErrorState {
-                pingResult := getGitDeployHealth()
+                pingResult := getUrlHealth(env.PingUrl)
                 if pingResult {
                     isInErrorState = false
                 }
                 continue
             }
 
-            pingResult := getGitDeployHealth()
+            pingResult := getUrlHealth(env.PingUrl)
             if !pingResult {
                 isInErrorState = true
                 for _, f := range onUnhealthyResponse {

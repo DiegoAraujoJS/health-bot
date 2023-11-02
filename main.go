@@ -12,7 +12,7 @@ func main() {
     env := environment.GetSafeEnvVariables()
 
     health.TickHealthChecker([]func(message *messages.AlarmMessage){
-        messages.SendTelegramMessageToPhoneId(env.PhoneId),
+        messages.SendTelegramMessageToPhoneId(env.TelegramBotToken, env.PhoneId),
         messages.SendDiscordMessage(env.DiscordBotToken, env.DiscordChannelIds),
     })
     fmt.Println("Started to tick health checker")

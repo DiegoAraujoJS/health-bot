@@ -2,14 +2,9 @@ package health
 
 import (
 	"net/http"
-
-	"github.com/DiegoAraujoJS/health-bot/environment"
 )
 
-func getGitDeployHealth() bool {
-    env := environment.GetSafeEnvVariables()
-    pingUrl := env.PingUrl
-
+func getUrlHealth(pingUrl string) bool {
     resp, err := http.Get(pingUrl)
     if err != nil {
         return false
