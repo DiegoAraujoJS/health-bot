@@ -1,11 +1,11 @@
 package health
 
 import (
-	"net/http"
+	"github.com/DiegoAraujoJS/health-bot/messages"
 )
 
 func getUrlHealth(pingUrl string) bool {
-    resp, err := http.Get(pingUrl)
+    resp, err := messages.HttpClient.Get(pingUrl)
     if err != nil {
         return false
     }

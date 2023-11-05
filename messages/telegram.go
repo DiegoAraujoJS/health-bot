@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 func SendTelegramMessageToPhoneId(botToken string, phoneId string) func(messsage *AlarmMessage) {
@@ -18,7 +17,7 @@ func sendTelegramMessage(botToken string, message *AlarmMessage, to string) {
         "chat_id": to,
         "text": message.Title + "\n\n" + message.Description + "\n\n" + message.EasyTest,
     })
-    _, err := http.Post(fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken), "application/json", bytes.NewBuffer(body))
+    _, err := HttpClient.Post(fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken), "application/json", bytes.NewBuffer(body))
     if err != nil {
         return
     }

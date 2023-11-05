@@ -34,5 +34,4 @@ func sendDiscordMessage(discordBotToken string, discordChannelIds []string, mess
 
     // Close the Discord session
     dg.Close()
-    fmt.Println("Finished sending message to discord channel")
 }
